@@ -266,8 +266,8 @@ AFRAME.registerComponent('no-fog', {
       })();
     </script>
     <button id="somaPlay" class="audio-btn" type="button"
-            aria-label="Play Space Station Soma"
-            title="Play Space Station Soma"
+            aria-label="Play Deep Space One"
+            title="Play Deep Space One"
             aria-pressed="false"
             data-playing="false">
       <svg class="icon icon-play" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -286,7 +286,7 @@ AFRAME.registerComponent('no-fog', {
         const audio = document.getElementById('somaAudio');
         audio.crossOrigin = 'anonymous';
 
-        // Default: Space Station Soma; Fallback: Deep Space One
+        // Default: Deep Space One; Fallback: Space Station Soma
         const stations = [
           { name: 'Deep Space One', url: 'https://ice6.somafm.com/deepspaceone-128-mp3' },
           { name: 'Space Station Soma', url: 'https://ice6.somafm.com/spacestation-128-mp3' }
