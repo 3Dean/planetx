@@ -9,6 +9,40 @@
     <meta name="PlanetX" content="WebVR! • A-Frame" />
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
      
+    <style>
+      .audio-btn {
+        position: fixed;
+        top: 14px;
+        right: 14px;
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        color: #fff;
+        display: grid;
+        place-items: center;
+        z-index: 10000;
+        cursor: pointer;
+        backdrop-filter: saturate(120%) blur(2px);
+      }
+      .audio-btn:hover {
+        background: rgba(0, 0, 0, 0.7);
+        border-color: rgba(255, 255, 255, 0.6);
+      }
+      .audio-btn:focus-visible {
+        outline: 2px solid #66aaff;
+        outline-offset: 2px;
+      }
+      .audio-btn .icon {
+        width: 18px;
+        height: 18px;
+        fill: currentColor;
+      }
+      .audio-btn .icon-pause { display: none; }
+      .audio-btn[data-playing="true"] .icon-play { display: none; }
+      .audio-btn[data-playing="true"] .icon-pause { display: block; }
+    </style>
   </head>
   <body>
     <script>
@@ -229,6 +263,94 @@ AFRAME.registerComponent('no-fog', {
         } else {
           init();
         }
+      })();
+    </script>
+    <button id="somaPlay" class="audio-btn" type="button"
+            aria-label="Play Space Station Soma"
+            title="Play Space Station Soma"
+            aria-pressed="false"
+            data-playing="false">
+      <svg class="icon icon-play" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M8 5v14l11-7z"></path>
+      </svg>
+      <svg class="icon icon-pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M6 5h4v14H6zM14 5h4v14h-4z"></path>
+      </svg>
+    </button>
+
+    <audio id="somaAudio" preload="none"></audio>
+
+    <script>
+      (function() {
+        const btn = document.getElementById('somaPlay');
+        const audio = document.getElementById('somaAudio');
+        audio.crossOrigin = 'anonymous';
+
+        // Default: Space Station Soma; Fallback: Deep Space One
+        const stations = [
+          { name: 'Deep Space One', url: 'https://ice6.somafm.com/deepspaceone-128-mp3' },
+          { name: 'Space Station Soma', url: 'https://ice6.somafm.com/spacestation-128-mp3' }
+        ];
+        let currentIndex = 0;
+
+        function setStation(i) {
+          currentIndex = i;
+          audio.src = stations[i].url;
+          btn.setAttribute('aria-label', (audio.paused ? 'Play ' : 'Pause ') + stations[i].name);
+          btn.setAttribute('title', (audio.paused ? 'Play ' : 'Pause ') + stations[i].name);
+        }
+
+        // Initialize with Space Station Soma
+        setStation(0);
+
+        function updateUi() {
+          const playing = !audio.paused && !audio.ended && audio.currentTime > 0;
+          btn.dataset.playing = playing ? 'true' : 'false';
+          btn.setAttribute('aria-pressed', playing ? 'true' : 'false');
+          btn.setAttribute('aria-label', (playing ? 'Pause ' : 'Play ') + stations[currentIndex].name);
+          btn.setAttribute('title', (playing ? 'Pause ' : 'Play ') + stations[currentIndex].name);
+        }
+
+        btn.addEventListener('click', async () => {
+          if (!audio.src) setStation(0);
+          if (audio.paused) {
+            try {
+              await audio.play();
+            } catch (err) {
+              console.warn('Playback failed:', err);
+            }
+          } else {
+            audio.pause();
+          }
+        });
+
+        // Keyboard accessibility
+        btn.addEventListener('keydown', (e) => {
+          if (e.key === ' ' || e.key === 'Enter') {
+            e.preventDefault();
+            btn.click();
+          }
+        });
+
+        audio.addEventListener('playing', updateUi);
+        audio.addEventListener('pause', updateUi);
+        audio.addEventListener('ended', () => {
+          updateUi();
+          // Streams rarely end; attempt to resume.
+          audio.play().catch(() => {});
+        });
+
+        // Fallback on error
+        let triedFallback = false;
+        audio.addEventListener('error', () => {
+          console.warn('Stream error; attempting fallback station.');
+          if (!triedFallback) {
+            triedFallback = true;
+            const next = (currentIndex + 1) % stations.length;
+            setStation(next);
+            audio.play().catch(err => console.warn('Fallback playback failed:', err));
+          }
+        });
       })();
     </script>
   </body>
