@@ -1,0 +1,170 @@
+:root {
+  color-scheme: dark;
+  font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
+  background: #000;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app,
+.app-shell,
+.viewport {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow: hidden;
+  background: radial-gradient(circle at 20% 20%, #1f0c2a 0%, #090411 45%, #000 100%);
+}
+
+.scene-canvas {
+  display: block;
+}
+
+.intro-fade {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 1000;
+  opacity: 1;
+  transition: opacity 2000ms ease;
+}
+
+.intro-fade.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loading-panel {
+  position: fixed;
+  left: 50%;
+  bottom: 1.5rem;
+  transform: translateX(-50%);
+  width: min(320px, calc(100vw - 2rem));
+  z-index: 1100;
+}
+
+.loading-label {
+  margin: 0 0 0.4rem;
+  font-size: 0.84rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #e4dbff;
+  text-align: center;
+}
+
+.loading-track {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  overflow: hidden;
+}
+
+.loading-bar {
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ff4f75 0%, #68b7ff 100%);
+  transition: width 250ms ease;
+}
+
+.error-label {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  margin: 0;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid rgba(255, 98, 98, 0.5);
+  background: rgba(45, 0, 0, 0.6);
+  color: #ffcaca;
+  font-size: 0.86rem;
+  z-index: 1200;
+}
+
+.caption {
+  position: fixed;
+  left: 50%;
+  bottom: 7rem;
+  width: min(900px, calc(100vw - 3rem));
+  transform: translateX(-50%);
+  margin: 0;
+  text-align: center;
+  line-height: 1.5;
+  font-size: clamp(0.94rem, 1.1vw + 0.42rem, 1.4rem);
+  color: #fff;
+  text-shadow: 0 3px 18px rgba(0, 0, 0, 0.85);
+  opacity: 1;
+  transition: opacity 3000ms linear;
+  z-index: 1050;
+}
+
+.caption.is-hidden {
+  opacity: 0;
+}
+
+.audio-btn {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  z-index: 1200;
+  cursor: pointer;
+  backdrop-filter: saturate(120%) blur(2px);
+}
+
+.audio-btn:hover {
+  background: rgba(0, 0, 0, 0.75);
+  border-color: rgba(255, 255, 255, 0.55);
+}
+
+.audio-btn:focus-visible {
+  outline: 2px solid #66aaff;
+  outline-offset: 2px;
+}
+
+.audio-btn .icon {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.audio-btn .icon-pause {
+  display: none;
+}
+
+.audio-btn[data-playing='true'] .icon-play {
+  display: none;
+}
+
+.audio-btn[data-playing='true'] .icon-pause {
+  display: block;
+}
+
+@media (max-width: 680px) {
+  .caption {
+    bottom: 6.3rem;
+    width: calc(100vw - 1.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-fade,
+  .caption,
+  .loading-bar {
+    transition: none;
+  }
+}

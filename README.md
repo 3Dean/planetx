@@ -1,103 +1,55 @@
-# Escape from Planet X
+# Escape from Planet X (Vite + Three.js)
 
-Exploring A‑Frame and WebXR, this is a small WebVR scene built as a self‑promotion/portfolio demo. It renders a rotating megastructure with a starfield and planet while a short, timed narrative fades in and out as on‑screen text. Works on desktop and in VR on supported browsers.
+A modular Three.js/WebXR scene rebuilt on Vite with TypeScript, loading/error states, caption timeline sequencing, and streaming audio controls.
 
-![Escape from Planet X](assets/screenshot.png)
+## Stack
 
-## Quick start (run locally)
+- Vite
+- TypeScript
+- Three.js + WebXR (`VRButton`)
+- ESLint + Prettier
 
-A local web server is recommended (most browsers restrict loading glTF/GLB via file://).
+## Project layout
 
-- Python 3 (Windows/macOS/Linux)
-  ```
-  # Windows (if 'py' works)
-  py -m http.server 8080
-  # Or (if 'python' works)
-  python -m http.server 8080
-  ```
-  Then open http://localhost:8080
+- `index.html` - Vite entry shell
+- `src/main.ts` - app bootstrap and system wiring
+- `src/scene/planetxScene.ts` - renderer, camera, controls, lights, GLTF loading, animation loop
+- `src/systems/timeline.ts` - timed narrative caption system
+- `src/systems/audioPlayer.ts` - stream player with fallback station
+- `src/ui/dom.ts` - app DOM shell
+- `src/config/constants.ts` - schedules, text, station, and asset constants
+- `src/styles.css` - application styles
+- `public/assets/` - GLTF/GLB and static assets
 
-- Node.js (zero‑install via npx)
-  ```
-  npx serve -l 8080 .
-  # or
-  npx http-server -p 8080 .
-  ```
-  Then open http://localhost:8080
+## Scripts
 
-- VS Code
-  - Install the “Live Server” extension, right‑click index.html, and choose “Open with Live Server”.
+- `npm run dev` - start local dev server
+- `npm run build` - typecheck + production build
+- `npm run preview` - preview built output
+- `npm run typecheck` - TypeScript validation
+- `npm run lint` - ESLint checks
+- `npm run format` - format files with Prettier
 
-Note: WebXR (VR) typically requires a secure context (https or http://localhost).
+## Run locally
 
-## Controls
+1. Install dependencies: `npm install`
+2. Start dev server: `npm run dev`
+3. Open the local URL printed by Vite
 
-- Desktop: Mouse/trackpad to look
-- VR: Click the “Enter VR” button (A‑Frame adds this on supported devices/browsers). Headset controls camera look.
+## Modernization outcomes
 
-## Features
+- Removed CDN runtime dependencies in favor of package-managed modules.
+- Split scene, UI, timeline, and audio into maintainable modules.
+- Added loading progress, asset error reporting, and intro fade sequencing.
+- Added explicit renderer setup (color space, DPR cap, resize handling, animation loop).
+- Added build/lint/format tooling baseline for CI.
 
-- A‑Frame 1.2.0
-- GLTF/GLB assets:
-  - `assets/trench.glb` (rotating structure)
-  - `assets/starfield.gltf`
-  - `assets/planetx2.glb`
-  - `assets/titlex.gltf`
-- Cinematic narrative overlay:
-  - 8 timed MSDF‑text panels with fade‑in/out animations
-  - Schedule (ms): 27000, 53000, 79000, 104000, 130000, 155000, 181000, 207000
-  - Dwell/hold (ms): 14000, Fade‑in (ms): 3000
-- Scene fog with selective opt‑out:
-  - Custom `no-fog` component disables fog on a model’s materials to keep starfield/planet/title crisp
-- Simple lighting (hemisphere + directional)
+## Next performance pass (recommended)
 
-## Project structure
-
-- `index.html` — main A‑Frame scene, text sequencing logic, components
-- `assets/`
-  - `planetx2.glb`
-  - `starfield.gltf`
-  - `titlex.gltf`
-  - `trench.glb`
-  - `screenshot.png`
-
-## How it works
-
-- Fog and no‑fog:
-  - The scene uses `fog="type: linear; color: #330033; near: 1; far: 1500"`.
-  - Entities with the `no-fog` component disable fog on all their loaded model materials:
-    ```js
-    AFRAME.registerComponent('no-fog', {
-      init: function () {
-        this.el.addEventListener('model-loaded', () => {
-          this.el.object3D.traverse((node) => {
-            if (node.material) node.material.fog = false;
-          });
-        });
-      }
-    });
-    ```
-- Narrative text:
-  - MSDF text mixin uses the Roboto font from the A‑Frame CDN.
-  - A script sets the `texts` array values on `#text1`..`#text8` and schedules show/fade events using `schedule`, `hold`, and `fadeInDur`.
-
-## Customize
-
-- Edit narrative: In `index.html`, update the `texts` array to change the story.
-- Timing: Adjust `schedule`, `hold`, and `fadeInDur` in the same script.
-- Fog behavior: Change the `fog` attribute on `<a-scene>`; add/remove `no-fog` on specific entities as needed.
-- Models: Replace files in `assets/` and update the corresponding `<a-asset-item>` sources/IDs.
-
-## Browser & VR support
-
-- Desktop: latest Chrome/Edge/Firefox with WebGL enabled.
-- VR: Requires a WebXR‑capable browser and device; must be served over https or `http://localhost`.
-
-## Acknowledgements
-
-- [A‑Frame](https://aframe.io/)
-- Roboto MSDF font from the A‑Frame CDN
+1. Optimize `public/assets/trench.glb` with glTF-Transform (`dedup`, `prune`, `draco` or `meshopt`).
+2. Compress large textures to KTX2/Basis where practical.
+3. Re-check startup and interaction FPS on mobile and desktop.
 
 ## License
 
-No license file is present in this directory. Code and assets are provided as‑is for demo/portfolio purposes.
+No license file is currently present in this repository.
